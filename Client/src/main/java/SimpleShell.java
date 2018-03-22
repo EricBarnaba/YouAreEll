@@ -1,16 +1,54 @@
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimpleShell {
 
 
-    public static void prettyPrint(String output) {
+    public static void prettyPrint(String output, ObjectType type) {
         // yep, make an effort to format things nicely, eh?
-        System.out.println(output);
+
+        if(type.equals(ObjectType.MESSAGE)){
+            try {
+                ArrayList<Message> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Message>>() {});
+                System.out.println();
+                messages.forEach(System.out::println);
+            }
+            catch(IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
+        else if (type.equals(ObjectType.ID)){
+            try {
+                ArrayList<Id> ids = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Id>>() {});
+                System.out.println();
+                ids.forEach(System.out::println);
+            }
+            catch(IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
+        else System.out.println("Something has gone wrong");
+
+//        try {
+//            ArrayList<JSONObject> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<JSONObject>>() {});
+//            for(JSONObject j : messages){
+//                System.out.println(j);
+//            }
+//        }
+//        catch(IOException ioe){
+//            System.out.println(ioe.getMessage());
+//        }
+
     }
     public static void main(String[] args) throws java.io.IOException {
 
@@ -41,11 +79,7 @@ public class SimpleShell {
             }
 
             //loop through to see if parsing worked
-            for (int i = 0; i < commands.length; i++) {
-                //System.out.println(commands[i]); //***check to see if parsing/split worked***
-                list.add(commands[i]);
-
-            }
+            Collections.addAll(list, commands);
             System.out.print(list); //***check to see if list was added correctly***
             history.addAll(list);
             try {
@@ -59,16 +93,51 @@ public class SimpleShell {
                 // Specific Commands.
 
                 // ids
-                if (list.contains("ids")) {
-                    String results = webber.get_ids();
-                    SimpleShell.prettyPrint(results);
+                if (list.get(0).equals("ids")) {
+                    if (list.size()==3){
+                        String userName = list.get(1);
+                        String gitHub = list.get(2);
+                        String payload = Mapper.mapper.writeValueAsString(new Id(userName,gitHub));
+                        webber.MakeURLCall("/ids","POST", payload);
+                    }
+                    else if (list.size()==1) {
+                        String results = webber.get_ids();
+                        SimpleShell.prettyPrint(results, ObjectType.ID);
+                    }
+                    else System.out.println("Invalid Command");
                     continue;
                 }
 
                 // messages
-                if (list.contains("messages")) {
-                    String results = webber.get_messages();
-                    SimpleShell.prettyPrint(results);
+                if (list.get(0).equals("messages")) {
+                    if(list.size()==2){
+                        String id = list.get(1);
+                        SimpleShell.prettyPrint(webber.MakeURLCall("/ids/" + id + "/messages", "GET", ""),ObjectType.MESSAGE);
+                    }
+                    else if(list.size()==1) {
+                        String results = webber.get_messages();
+                        SimpleShell.prettyPrint(results, ObjectType.MESSAGE);
+                    }
+                    else System.out.println("Invalid Command");
+                    continue;
+                }
+
+                if(list.get(0).equals("send")){
+                    Pattern messageNoTo = Pattern.compile("'(.*)'");
+                    Pattern messageTo = Pattern.compile("'(.*)' (to) (.*)");
+                    Matcher withTo = messageTo.matcher(commandLine);
+                    Matcher noTo = messageNoTo.matcher(commandLine);
+                    String from = list.get(1);
+                    if(withTo.find()){
+                        String to = withTo.group(3);
+                        String payload = Mapper.mapper.writeValueAsString(new Message(from, to, withTo.group(1)));
+                        webber.MakeURLCall("/ids/" + to + "/messages", "POST", payload);
+                    }
+                    else if(noTo.find()) {
+                        String payload = Mapper.mapper.writeValueAsString(new Message(from, noTo.group(1)));
+                        webber.MakeURLCall("/ids/" + from + "/messages", "POST", payload);
+                    }
+                    else System.out.println("Invalid message format");
                     continue;
                 }
                 // you need to add a bunch more.

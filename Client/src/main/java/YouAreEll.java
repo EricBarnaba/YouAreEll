@@ -13,14 +13,13 @@ public class YouAreEll {
 
 
     YouAreEll() {
-
     }
 
     public static void main(String[] args) {
-        ObjectMapper mapper = new ObjectMapper();
+
         YouAreEll urlhandler = new YouAreEll();
-//        Id ericB = new Id("EricB", "EricBarnaba");
-//        Message testMessage = new Message("EricBarnaba", "Now that I've made contact with the world it's time for dinner!");
+//        Id stinkyPete = new Id("Stinky Pete", "StinkyPete");
+//        Message testMessage = new Message("EricBarnaba","JoeHendricks415", "Chicken on a BISCUIT");
 //        try {
 //            String json = mapper.writeValueAsString(testMessage);
 //            urlhandler.MakeURLCall("/ids/EricBarnaba/messages", "POST", json );
@@ -30,8 +29,8 @@ public class YouAreEll {
 //            System.out.println(jpe.getMessage());
 //        }
 
-        System.out.println(urlhandler.MakeURLCall("/ids", "GET", ""));
-        System.out.println(urlhandler.MakeURLCall("/messages", "GET", ""));
+        System.out.println(urlhandler.get_ids());
+        System.out.println(urlhandler.get_messages());
     }
 
     public String get_ids() {

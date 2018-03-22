@@ -5,6 +5,9 @@ public class Message {
     String toid;
     String message;
 
+    public Message (){}
+
+
     public Message(String fromid, String message){
         this.sequence = "-";
         this.timestamp="2018-03-21T01:00:00.0Z";
@@ -47,6 +50,11 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString(){
+        return String.format("TimeStamp: %-30s From: %-30s To: %-30s Message: %s ",this.timestamp, this.fromid, this.toid, this.message);
     }
 
 
