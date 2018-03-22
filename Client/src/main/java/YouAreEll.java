@@ -1,12 +1,7 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class YouAreEll {
 
@@ -18,19 +13,17 @@ public class YouAreEll {
     public static void main(String[] args) {
 
         YouAreEll urlhandler = new YouAreEll();
-//        Id stinkyPete = new Id("Stinky Pete", "StinkyPete");
-//        Message testMessage = new Message("EricBarnaba","JoeHendricks415", "Chicken on a BISCUIT");
-//        try {
-//            String json = mapper.writeValueAsString(testMessage);
-//            urlhandler.MakeURLCall("/ids/EricBarnaba/messages", "POST", json );
-//            //System.out.println(json);
-//        }
-//        catch(JsonProcessingException jpe){
-//            System.out.println(jpe.getMessage());
-//        }
+        Id stinkyPete = new Id("Stinky Pete", "StinkyPete");
+        try {
+            String json = Mapper.mapper.writeValueAsString(stinkyPete);
+            urlhandler.MakeURLCall("/ids", "PUT", json );
+        }
+        catch(JsonProcessingException jpe){
+            System.out.println(jpe.getMessage());
+        }
 
-        System.out.println(urlhandler.get_ids());
-        System.out.println(urlhandler.get_messages());
+//        System.out.println(urlhandler.get_ids());
+//        System.out.println(urlhandler.get_messages());
     }
 
     public String get_ids() {
@@ -66,8 +59,7 @@ public class YouAreEll {
 
         else if (method.equals("PUT")){
             try {
-                System.out.println(jpayload);
-                Request.Put(url)
+                return Request.Put(url)
                         .useExpectContinue().bodyString(jpayload, ContentType.APPLICATION_JSON)
                         .execute().returnContent().asString();
             }
