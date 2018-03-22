@@ -29,5 +29,25 @@ public class Message {
         this.message = message;
     }
 
+    public String getSequence() {
+        return sequence;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getFromid() {
+        return fromid;
+    }
+
+    public String getToid() {
+        return toid;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
 
 }

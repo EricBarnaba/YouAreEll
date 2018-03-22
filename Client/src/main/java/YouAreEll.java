@@ -20,9 +20,10 @@ public class YouAreEll {
         ObjectMapper mapper = new ObjectMapper();
         YouAreEll urlhandler = new YouAreEll();
 //        Id ericB = new Id("EricB", "EricBarnaba");
+//        Message testMessage = new Message("EricBarnaba", "Now that I've made contact with the world it's time for dinner!");
 //        try {
-//            String json = mapper.writeValueAsString(ericB);
-//            urlhandler.MakeURLCall("/ids", "POST", json );
+//            String json = mapper.writeValueAsString(testMessage);
+//            urlhandler.MakeURLCall("/ids/EricBarnaba/messages", "POST", json );
 //            //System.out.println(json);
 //        }
 //        catch(JsonProcessingException jpe){
@@ -46,8 +47,7 @@ public class YouAreEll {
 
         if(method.equals("GET")){
             try{
-                System.out.println(Request.Get(url)
-                        .execute().returnContent());
+                return Request.Get(url).execute().returnContent().asString();
             }
             catch(IOException ioe){
                 System.out.println(ioe.getMessage());
@@ -56,22 +56,26 @@ public class YouAreEll {
         }
         else if (method.equals("POST")){
             try {
-                //StringEntity json = new StringEntity(jpayload);
-                System.out.println(jpayload);
-                Request.Post(url)
-                        .useExpectContinue().bodyString(jpayload, ContentType.DEFAULT_TEXT)
-                        .execute().returnContent();
+                return Request.Post(url)
+                        .bodyString(jpayload, ContentType.APPLICATION_JSON)
+                        .execute().returnContent().asString();
             }
             catch(IOException ioe){
                 System.out.println(ioe.getMessage());
             }
-
-
         }
+
         else if (method.equals("PUT")){
-
+            try {
+                System.out.println(jpayload);
+                Request.Put(url)
+                        .useExpectContinue().bodyString(jpayload, ContentType.APPLICATION_JSON)
+                        .execute().returnContent().asString();
+            }
+            catch(IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
         }
-
         return "nada";
     }
 }
