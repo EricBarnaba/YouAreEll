@@ -36,16 +36,6 @@ public class SimpleShell {
             }
         } else System.out.println("Something has gone wrong");
 
-//        try {
-//            ArrayList<JSONObject> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<JSONObject>>() {});
-//            for(JSONObject j : messages){
-//                System.out.println(j);
-//            }
-//        }
-//        catch(IOException ioe){
-//            System.out.println(ioe.getMessage());
-//        }
-
     }
 
     public static void main(String[] args) throws java.io.IOException {
@@ -103,38 +93,20 @@ public class SimpleShell {
                 // messages
                 if (list.get(0).equals("messages")) {
                     if (list.size() == 2) {
-                        String id = list.get(1);
-                        SimpleShell.prettyPrint(YouAreEll.MakeURLCall("/ids/" + id + "/messages", "GET", ""), ObjectType.MESSAGE);
+                        new Thread(new MessageController(MessageCommand.GET_TO_SPECIFIC, commandLine)).start();
                     } else if (list.size() == 1) {
-                        String results = YouAreEll.get_messages();
-                        SimpleShell.prettyPrint(results, ObjectType.MESSAGE);
+                        new Thread(new MessageController(MessageCommand.GET_ALL, commandLine)).start();
                     } else System.out.println("Invalid Command");
                     continue;
                 }
 
                 if (list.get(0).equals("send")) {
-                    Pattern messageNoTo = Pattern.compile("'(.*)'");
-                    Pattern messageTo = Pattern.compile("'(.*)' (to) (.*)");
-                    Matcher withTo = messageTo.matcher(commandLine);
-                    Matcher noTo = messageNoTo.matcher(commandLine);
-                    String from = list.get(1);
-                    if (withTo.find()) {
-                        String to = withTo.group(3);
-                        String payload = Mapper.mapper.writeValueAsString(new Message(from, to, withTo.group(1)));
-                        YouAreEll.MakeURLCall("/ids/" + to + "/messages", "POST", payload);
-                    } else if (noTo.find()) {
-                        String payload = Mapper.mapper.writeValueAsString(new Message(from, noTo.group(1)));
-                        YouAreEll.MakeURLCall("/ids/" + from + "/messages", "POST", payload);
-                    } else System.out.println("Invalid message format");
+                    new Thread(new MessageController(MessageCommand.SEND, commandLine)).start();
                     continue;
                 }
 
                 if (list.get(0).equals("wait")) {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException ie) {
-                        System.out.println(ie.getMessage());
-                    }
+                    new Thread(new MessageController(MessageCommand.WAIT, commandLine)).start();
                 }
                 // you need to add a bunch more.
 
