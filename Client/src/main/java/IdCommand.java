@@ -1,6 +1,6 @@
 public enum IdCommand {
 
-    GETALL,
+    GET_ALL,
     POST_ID;
 
 

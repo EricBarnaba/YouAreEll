@@ -1,5 +1,4 @@
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -94,16 +93,9 @@ public class SimpleShell {
                 // ids
                 if (list.get(0).equals("ids")) {
                     if (list.size() == 3) {
-//                        String userName = list.get(1);
-//                        String gitHub = list.get(2);
-//                        String payload = Mapper.mapper.writeValueAsString(new Id(userName, gitHub));
-//                        YouAreEll.MakeURLCall("/ids", "POST", payload);
                         new Thread(new IdController(IdCommand.POST_ID,commandLine)).start();
                     } else if (list.size() == 1) {
-//                        String results = YouAreEll.get_ids();
-//                        SimpleShell.prettyPrint(results, ObjectType.ID);
-                        new Thread(new IdController(IdCommand.GETALL)).start();
-
+                        new Thread(new IdController(IdCommand.GET_ALL)).start();
                     } else System.out.println("Invalid Command");
                     continue;
                 }

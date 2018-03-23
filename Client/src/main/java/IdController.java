@@ -1,8 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class IdController implements Runnable {
 
     private IdCommand command;
@@ -21,7 +18,7 @@ public class IdController implements Runnable {
 
     @Override
     public void run() {
-        if(this.command.equals(IdCommand.GETALL)){
+        if(this.command.equals(IdCommand.GET_ALL)){
             getAll();
         }
         else if (this.command.equals(IdCommand.POST_ID)){
