@@ -51,7 +51,7 @@ public class SimpleShell {
 
     public static void main(String[] args) throws java.io.IOException {
 
-        YouAreEll webber = new YouAreEll();
+        //YouAreEll webber = new YouAreEll();
         String commandLine;
         BufferedReader console = new BufferedReader
                 (new InputStreamReader(System.in));
@@ -94,13 +94,16 @@ public class SimpleShell {
                 // ids
                 if (list.get(0).equals("ids")) {
                     if (list.size() == 3) {
-                        String userName = list.get(1);
-                        String gitHub = list.get(2);
-                        String payload = Mapper.mapper.writeValueAsString(new Id(userName, gitHub));
-                        webber.MakeURLCall("/ids", "POST", payload);
+//                        String userName = list.get(1);
+//                        String gitHub = list.get(2);
+//                        String payload = Mapper.mapper.writeValueAsString(new Id(userName, gitHub));
+//                        YouAreEll.MakeURLCall("/ids", "POST", payload);
+                        new Thread(new IdController(IdCommand.POST_ID,commandLine)).start();
                     } else if (list.size() == 1) {
-                        String results = webber.get_ids();
-                        SimpleShell.prettyPrint(results, ObjectType.ID);
+//                        String results = YouAreEll.get_ids();
+//                        SimpleShell.prettyPrint(results, ObjectType.ID);
+                        new Thread(new IdController(IdCommand.GETALL)).start();
+
                     } else System.out.println("Invalid Command");
                     continue;
                 }
@@ -109,9 +112,9 @@ public class SimpleShell {
                 if (list.get(0).equals("messages")) {
                     if (list.size() == 2) {
                         String id = list.get(1);
-                        SimpleShell.prettyPrint(webber.MakeURLCall("/ids/" + id + "/messages", "GET", ""), ObjectType.MESSAGE);
+                        SimpleShell.prettyPrint(YouAreEll.MakeURLCall("/ids/" + id + "/messages", "GET", ""), ObjectType.MESSAGE);
                     } else if (list.size() == 1) {
-                        String results = webber.get_messages();
+                        String results = YouAreEll.get_messages();
                         SimpleShell.prettyPrint(results, ObjectType.MESSAGE);
                     } else System.out.println("Invalid Command");
                     continue;
@@ -126,10 +129,10 @@ public class SimpleShell {
                     if (withTo.find()) {
                         String to = withTo.group(3);
                         String payload = Mapper.mapper.writeValueAsString(new Message(from, to, withTo.group(1)));
-                        webber.MakeURLCall("/ids/" + to + "/messages", "POST", payload);
+                        YouAreEll.MakeURLCall("/ids/" + to + "/messages", "POST", payload);
                     } else if (noTo.find()) {
                         String payload = Mapper.mapper.writeValueAsString(new Message(from, noTo.group(1)));
-                        webber.MakeURLCall("/ids/" + from + "/messages", "POST", payload);
+                        YouAreEll.MakeURLCall("/ids/" + from + "/messages", "POST", payload);
                     } else System.out.println("Invalid message format");
                     continue;
                 }

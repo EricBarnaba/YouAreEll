@@ -10,31 +10,31 @@ public class YouAreEll {
     YouAreEll() {
     }
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//
+//        YouAreEll urlhandler = new YouAreEll();
+//        Id stinkyPete = new Id("Stinky Pete", "StinkyPete");
+//        try {
+//            String json = Mapper.mapper.writeValueAsString(stinkyPete);
+//            urlhandler.MakeURLCall("/ids", "PUT", json );
+//        }
+//        catch(JsonProcessingException jpe){
+//            System.out.println(jpe.getMessage());
+//        }
+//
+////        System.out.println(urlhandler.get_ids());
+////        System.out.println(urlhandler.get_messages());
+//    }
 
-        YouAreEll urlhandler = new YouAreEll();
-        Id stinkyPete = new Id("Stinky Pete", "StinkyPete");
-        try {
-            String json = Mapper.mapper.writeValueAsString(stinkyPete);
-            urlhandler.MakeURLCall("/ids", "PUT", json );
-        }
-        catch(JsonProcessingException jpe){
-            System.out.println(jpe.getMessage());
-        }
-
-//        System.out.println(urlhandler.get_ids());
-//        System.out.println(urlhandler.get_messages());
-    }
-
-    public String get_ids() {
+    public static String get_ids() {
         return MakeURLCall("/ids", "GET", "");
     }
 
-    public String get_messages() {
+    public static String get_messages() {
         return MakeURLCall("/messages", "GET", "");
     }
 
-    public String MakeURLCall(String mainurl, String method, String jpayload) {
+    public static String MakeURLCall(String mainurl, String method, String jpayload) {
         String url = "http://zipcode.rocks:8085" + mainurl;
 
         if(method.equals("GET")){
