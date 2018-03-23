@@ -155,21 +155,35 @@ public class SimpleShell {
                     pb.command(list);
                 }
 
-                // wait, wait, what curiousness is this?
-                Process process = pb.start();
+                 class ProcessThread implements Runnable{
 
-                //obtain the input stream
-                InputStream is = process.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
+                    @Override
+                    public void run() {
+                        // wait, wait, what curiousness is this?
+                        try {
+                            Process process = pb.start();
 
-                //read output of the process
-                String line;
-                while ((line = br.readLine()) != null)
-                    System.out.println(line);
-                br.close();
+                            //obtain the input stream
+                            InputStream is = process.getInputStream();
+                            InputStreamReader isr = new InputStreamReader(is);
+                            BufferedReader br = new BufferedReader(isr);
+
+                            //read output of the process
+                            String line;
 
 
+                            while ((line = br.readLine()) != null)
+                                System.out.println(line);
+                            br.close();
+                        }
+                        catch(IOException ioe){
+                            System.out.println(ioe.getMessage());
+                        }
+
+                    }
+
+                }
+                new Thread(new ProcessThread()).run();
             }
 
             //catch ioexception, output appropriate message, resume waiting for input
