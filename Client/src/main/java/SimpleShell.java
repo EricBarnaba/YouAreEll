@@ -17,27 +17,25 @@ public class SimpleShell {
     public static void prettyPrint(String output, ObjectType type) {
         // yep, make an effort to format things nicely, eh?
 
-        if(type.equals(ObjectType.MESSAGE)){
+        if (type.equals(ObjectType.MESSAGE)) {
             try {
-                ArrayList<Message> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Message>>() {});
+                ArrayList<Message> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Message>>() {
+                });
                 System.out.println();
                 messages.forEach(System.out::println);
-            }
-            catch(IOException ioe){
+            } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
             }
-        }
-        else if (type.equals(ObjectType.ID)){
+        } else if (type.equals(ObjectType.ID)) {
             try {
-                ArrayList<Id> ids = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Id>>() {});
+                ArrayList<Id> ids = Mapper.mapper.readValue(output, new TypeReference<ArrayList<Id>>() {
+                });
                 System.out.println();
                 ids.forEach(System.out::println);
-            }
-            catch(IOException ioe){
+            } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
             }
-        }
-        else System.out.println("Something has gone wrong");
+        } else System.out.println("Something has gone wrong");
 
 //        try {
 //            ArrayList<JSONObject> messages = Mapper.mapper.readValue(output, new TypeReference<ArrayList<JSONObject>>() {});
@@ -50,6 +48,7 @@ public class SimpleShell {
 //        }
 
     }
+
     public static void main(String[] args) throws java.io.IOException {
 
         YouAreEll webber = new YouAreEll();
@@ -94,51 +93,53 @@ public class SimpleShell {
 
                 // ids
                 if (list.get(0).equals("ids")) {
-                    if (list.size()==3){
+                    if (list.size() == 3) {
                         String userName = list.get(1);
                         String gitHub = list.get(2);
-                        String payload = Mapper.mapper.writeValueAsString(new Id(userName,gitHub));
-                        webber.MakeURLCall("/ids","POST", payload);
-                    }
-                    else if (list.size()==1) {
+                        String payload = Mapper.mapper.writeValueAsString(new Id(userName, gitHub));
+                        webber.MakeURLCall("/ids", "POST", payload);
+                    } else if (list.size() == 1) {
                         String results = webber.get_ids();
                         SimpleShell.prettyPrint(results, ObjectType.ID);
-                    }
-                    else System.out.println("Invalid Command");
+                    } else System.out.println("Invalid Command");
                     continue;
                 }
 
                 // messages
                 if (list.get(0).equals("messages")) {
-                    if(list.size()==2){
+                    if (list.size() == 2) {
                         String id = list.get(1);
-                        SimpleShell.prettyPrint(webber.MakeURLCall("/ids/" + id + "/messages", "GET", ""),ObjectType.MESSAGE);
-                    }
-                    else if(list.size()==1) {
+                        SimpleShell.prettyPrint(webber.MakeURLCall("/ids/" + id + "/messages", "GET", ""), ObjectType.MESSAGE);
+                    } else if (list.size() == 1) {
                         String results = webber.get_messages();
                         SimpleShell.prettyPrint(results, ObjectType.MESSAGE);
-                    }
-                    else System.out.println("Invalid Command");
+                    } else System.out.println("Invalid Command");
                     continue;
                 }
 
-                if(list.get(0).equals("send")){
+                if (list.get(0).equals("send")) {
                     Pattern messageNoTo = Pattern.compile("'(.*)'");
                     Pattern messageTo = Pattern.compile("'(.*)' (to) (.*)");
                     Matcher withTo = messageTo.matcher(commandLine);
                     Matcher noTo = messageNoTo.matcher(commandLine);
                     String from = list.get(1);
-                    if(withTo.find()){
+                    if (withTo.find()) {
                         String to = withTo.group(3);
                         String payload = Mapper.mapper.writeValueAsString(new Message(from, to, withTo.group(1)));
                         webber.MakeURLCall("/ids/" + to + "/messages", "POST", payload);
-                    }
-                    else if(noTo.find()) {
+                    } else if (noTo.find()) {
                         String payload = Mapper.mapper.writeValueAsString(new Message(from, noTo.group(1)));
                         webber.MakeURLCall("/ids/" + from + "/messages", "POST", payload);
-                    }
-                    else System.out.println("Invalid message format");
+                    } else System.out.println("Invalid message format");
                     continue;
+                }
+
+                if (list.get(0).equals("wait")) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ie) {
+                        System.out.println(ie.getMessage());
+                    }
                 }
                 // you need to add a bunch more.
 
@@ -155,35 +156,21 @@ public class SimpleShell {
                     pb.command(list);
                 }
 
-                 class ProcessThread implements Runnable{
+                Process process = pb.start();
 
-                    @Override
-                    public void run() {
-                        // wait, wait, what curiousness is this?
-                        try {
-                            Process process = pb.start();
+                //obtain the input stream
+                InputStream is = process.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader br = new BufferedReader(isr);
 
-                            //obtain the input stream
-                            InputStream is = process.getInputStream();
-                            InputStreamReader isr = new InputStreamReader(is);
-                            BufferedReader br = new BufferedReader(isr);
+                //read output of the process
+                String line;
 
-                            //read output of the process
-                            String line;
+                while ((line = br.readLine()) != null)
+                    System.out.println(line);
+                br.close();
 
 
-                            while ((line = br.readLine()) != null)
-                                System.out.println(line);
-                            br.close();
-                        }
-                        catch(IOException ioe){
-                            System.out.println(ioe.getMessage());
-                        }
-
-                    }
-
-                }
-                new Thread(new ProcessThread()).run();
             }
 
             //catch ioexception, output appropriate message, resume waiting for input
